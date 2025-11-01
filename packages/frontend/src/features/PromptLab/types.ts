@@ -1,0 +1,1 @@
+export type FormValue = Record<string, string>;

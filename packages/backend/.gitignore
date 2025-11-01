@@ -1,0 +1,5 @@
+node_modules
+# Keep environment variables out of version control
+.env
+# Keep Firebase credentials out of version control
+firebase-key.json

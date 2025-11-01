@@ -1,0 +1,95 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Prompt {
+  id             Int             @id @default(autoincrement())
+  title          String          @db.VarChar(100)
+  content        String?
+  slug           String          @unique @db.VarChar(200)
+  created_at     DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime        @updatedAt @db.Timestamptz(6)
+  description    String?
+  color          String?         @db.VarChar
+  icon           String?         @db.VarChar
+  publish_status Boolean?        @default(false)
+  author         User            @relation(fields: [authorId], references: [id])
+  authorId       Int
+  categoryId     Int
+  participations Participation[]
+
+  category PromptCategory @relation(fields: [categoryId], references: [id])
+}
+
+model PromptCategory {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  prompts Prompt[]
+}
+
+model InterfaceType {
+  id             Int             @id @default(autoincrement())
+  name           String          @unique
+  participations Participation[]
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  uid            String          @unique
+  email          String          @unique
+  emailVerified  Boolean
+  displayName    String?
+  isAnonymous    Boolean
+  photoURL       String?
+  createdAt      String
+  lastLoginAt    String
+  prompts        Prompt[]
+  participations Participation[]
+}
+
+model Experiment {
+  id                Int      @id @default(autoincrement())
+  name              String   @unique
+  description       String?
+  prompts           Int[]
+  interfaces        String[]
+  categoryPromptMap Json
+
+  participations Participation[]
+}
+
+// Participant_Task table
+model Participation {
+  id              Int           @id @default(autoincrement())
+  participantId   Int
+  experimentId    Int
+  interfaceTypeId Int
+  promptId        Int
+  timeStarted     DateTime
+  timeEnded       DateTime?
+  status          TaskStatus    @default(IDLE)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  // Define foreign key constraints
+  participant     User          @relation(fields: [participantId], references: [id])
+  experiment      Experiment    @relation(fields: [experimentId], references: [id])
+  prompt          Prompt        @relation(fields: [promptId], references: [id])
+  interfaceType   InterfaceType @relation(fields: [interfaceTypeId], references: [id])
+
+  // Index combining participantId, experimentId, interfaceTypeId, and promptId
+  @@index([participantId, experimentId, interfaceTypeId, promptId], name: "CombinedIndex")
+  // Index combining participantId and experimentId
+  @@index([participantId, experimentId], name: "ParticipantExperimentIndex")
+}
+
+enum TaskStatus {
+  IDLE
+  START
+  DONE
+}

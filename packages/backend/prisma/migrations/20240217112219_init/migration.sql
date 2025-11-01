@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Prompt" ALTER COLUMN "updated_at" SET DATA TYPE TIMESTAMPTZ(6);

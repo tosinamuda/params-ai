@@ -1,0 +1,13 @@
+{
+  "author": "Tosin Amuda <tosinamuda@gmail.com>",
+  "description": "Fast API Backend",
+  "license": "MIT",
+  "main": "index.js",
+  "name": "@params/py-server",
+  "private": true,
+  "scripts": {
+    "preinstall": "pip install --user poetry; mkdir .venv; poetry install --no-root",
+    "start": "poetry run python server.py"
+  },
+  "version": "0.0.1"
+}
